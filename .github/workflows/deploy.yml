@@ -25,9 +25,9 @@ jobs:
       - name: Initialize Firebase project
         run: |
           if firebase projects:list --project $FIREBASE_PROJECT_ID > /dev/null; then
-            echo "Project already exists, updating..."
+            echo "Project already exists: $FIREBASE_PROJECT_ID, updating..."
           else
-            echo "Creating new project..."
+            echo "Creating new project: $FIREBASE_PROJECT_ID..."
             firebase projects:create $FIREBASE_PROJECT_ID --non-interactive
           fi
 
