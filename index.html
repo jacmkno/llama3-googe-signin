@@ -8,9 +8,7 @@
 <body>
   <div id="app">
     <template v-if="!user">
-      <button @click="login">Login</button>
-      <button @click="register">Register</button>
-      <button @click="recoverPassword">Recover Password</button>
+      <button @click="loginWithGoogle">Login with Google</button>
     </template>
     <template v-else>
       <textarea v-model="text"></textarea>
@@ -26,14 +24,8 @@
         text: ''
       },
       methods: {
-        login() {
+        loginWithGoogle() {
           firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
-        },
-        register() {
-          firebase.auth().createUserWithEmailAndPassword('email@example.com', 'password');
-        },
-        recoverPassword() {
-          firebase.auth().sendPasswordResetEmail('email@example.com');
         },
         saveText() {
           if (this.user) {
