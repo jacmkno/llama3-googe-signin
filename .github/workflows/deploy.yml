@@ -38,7 +38,7 @@ jobs:
         uses: actions/github-pages@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory:.
+          directory: .
 
       - name: Deploy to Firebase Hosting
         run: firebase deploy --project $FIREBASE_PROJECT_ID --non-interactive
