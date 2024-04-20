@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase Auth & Storage</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase.js"></script>
+</head>
+<body>
+  <div id="app">
+    <template v-if="!user">
+      <button @click="login">Login</button>
+      <button @click="register">Register</button>
+      <button @click="recoverPassword">Recover Password</button>
+    </template>
+    <template v-else>
+      <textarea v-model="text"></textarea>
+      <button @click="saveText">Save Text</button>
+    </template>
+  </div>
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        user: null,
+        text: ''
+      },
+      methods: {
+        login() {
+          firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        },
+        register() {
+          firebase.auth().createUserWithEmailAndPassword('email@example.com', 'password');
+        },
+        recoverPassword() {
+          firebase.auth().sendPasswordResetEmail('email@example.com');
+        },
+        saveText() {
+          if (this.user) {
+            firebase.storage().ref('texts/' + this.user.uid).putString(this.text);
+          }
+        }
+      },
+      mounted() {
+        firebase.auth().onAuthStateChanged(user => {
+          this.user = user;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
