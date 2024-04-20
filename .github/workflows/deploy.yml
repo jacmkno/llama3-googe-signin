@@ -8,8 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,9 +23,9 @@ jobs:
       - name: Initialize Firebase project
         run: |
           if firebase projects:list --project $FIREBASE_PROJECT_ID > /dev/null; then
-            echo "Project already exists: $FIREBASE_PROJECT_ID, updating..."
+            echo "Project already exists, updating..."
           else
-            echo "Creating new project: $FIREBASE_PROJECT_ID..."
+            echo "Creating new project..."
             firebase projects:create $FIREBASE_PROJECT_ID --non-interactive
           fi
 
@@ -40,7 +38,7 @@ jobs:
         uses: actions/github-pages@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory: .
+          directory:.
 
       - name: Deploy to Firebase Hosting
         run: firebase deploy --project $FIREBASE_PROJECT_ID --non-interactive
