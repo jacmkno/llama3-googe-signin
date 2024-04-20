@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -22,23 +24,23 @@ jobs:
 
       - name: Initialize Firebase project
         run: |
-          if firebase projects:list --project ${{ secrets.FIREBASE_PROJECT_ID }} > /dev/null; then
+          if firebase projects:list --project $FIREBASE_PROJECT_ID > /dev/null; then
             echo "Project already exists, updating..."
           else
             echo "Creating new project..."
-            firebase projects:create ${{ secrets.FIREBASE_PROJECT_ID }} --non-interactive
+            firebase projects:create $FIREBASE_PROJECT_ID --non-interactive
           fi
 
       - name: Enable Google sign-in provider
         run: |
-          firebase auth:providers:create google.com --project ${{ secrets.FIREBASE_PROJECT_ID }}
-          firebase auth:config:set --project ${{ secrets.FIREBASE_PROJECT_ID }} --oauth-redirect-uri "http://localhost:5000/__/auth/handler"
+          firebase auth:providers:create google.com --project $FIREBASE_PROJECT_ID
+          firebase auth:config:set --project $FIREBASE_PROJECT_ID --oauth-redirect-uri "http://localhost:5000/__/auth/handler"
 
       - name: Deploy to GitHub Pages
         uses: actions/github-pages@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory:.
+          directory: .
 
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --project ${{ secrets.FIREBASE_PROJECT_ID }} --non-interactive
+        run: firebase deploy --project $FIREBASE_PROJECT_ID --non-interactive
