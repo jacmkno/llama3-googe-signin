@@ -34,11 +34,5 @@ jobs:
           firebase auth:providers:create google.com --project $FIREBASE_PROJECT_ID
           firebase auth:config:set --project $FIREBASE_PROJECT_ID --oauth-redirect-uri "http://localhost:5000/__/auth/handler"
 
-      - name: Deploy to GitHub Pages
-        uses: actions/github-pages@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory: .
-
       - name: Deploy to Firebase Hosting
         run: firebase deploy --project $FIREBASE_PROJECT_ID --non-interactive
