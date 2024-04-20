@@ -1,0 +1,46 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Login to Firebase
+        uses: google-github-actions/auth@v1
+        with:
+          credentials: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Initialize Firebase project
+        run: |
+          if firebase projects:list --project $FIREBASE_PROJECT_ID > /dev/null; then
+            echo "Project already exists, updating..."
+          else
+            echo "Creating new project..."
+            firebase projects:create $FIREBASE_PROJECT_ID --non-interactive
+          fi
+
+      - name: Enable Google sign-in provider
+        run: |
+          firebase auth:providers:create google.com --project $FIREBASE_PROJECT_ID
+          firebase auth:config:set --project $FIREBASE_PROJECT_ID --oauth-redirect-uri "http://localhost:5000/__/auth/handler"
+
+      - name: Replace keys in index.html
+        run: |
+          API_KEY=$(firebase auth:export-api-key --project $FIREBASE_PROJECT_ID)
+          AUTH_DOMAIN=$(firebase auth:export-auth-domain --project $FIREBASE_PROJECT_ID)
+          sed -i "s/<API_KEY>/$API_KEY/g" index.html
+          sed -i "s/<AUTH_DOMAIN>/$AUTH_DOMAIN/g" index.html
+          sed -i "s/<PROJECT_ID>/$FIREBASE_PROJECT_ID/g" index.html
+
+      - name: Deploy to Firebase Hosting
+        run: firebase deploy --project $FIREBASE_PROJECT_ID --non-interactive
